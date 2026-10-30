@@ -1772,6 +1772,7 @@ describe("startAutoUpdates", () => {
       state: "error",
       message:
         "Couldn't check for updates — the update information was not found on the server.",
+      errorInfo: { kind: "not-found", phase: "check" },
       checkedAt: expect.any(Number),
     });
   });
@@ -1792,6 +1793,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus()).toEqual({
       state: "error",
       message: "Download failed — the update file was not found on the server.",
+      errorInfo: { kind: "not-found", phase: "download" },
     });
   });
 
@@ -1809,6 +1811,7 @@ describe("startAutoUpdates", () => {
       state: "error",
       message:
         "Couldn't check for updates — the update information was not found on the server.",
+      errorInfo: { kind: "not-found", phase: "check" },
     });
   });
 
@@ -1825,6 +1828,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus()).toEqual({
       state: "error",
       message: "Download failed — the update file was not found on the server.",
+      errorInfo: { kind: "not-found", phase: "download" },
     });
   });
 
@@ -1918,6 +1922,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus()).toEqual({
       state: "error",
       message: "Couldn't check for updates — the update information was not found on the server.",
+      errorInfo: { kind: "not-found", phase: "check" },
       checkedAt: expect.any(Number),
     });
   });
@@ -1968,6 +1973,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus().checkError).toBe(
       "Couldn't check for updates — the update server timed out. Try again in a few minutes.",
     );
+    expect(module.getUpdateStatus().checkErrorInfo).toEqual({ kind: "timeout", phase: "check" });
   });
 
   // The check-error notice has no netError guidance of its own, so a bare
@@ -2013,6 +2019,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus()).toEqual({
       state: "error",
       message: "Couldn't check for updates — the update server couldn't be reached. Check your connection and try again.",
+      errorInfo: { kind: "unreachable", phase: "check" },
       netError: true,
     });
   });
@@ -2026,6 +2033,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus()).toEqual({
       state: "error",
       message: "Couldn't check for updates — the update server couldn't be reached. Check your connection and try again.",
+      errorInfo: { kind: "unreachable", phase: "check" },
       netError: true,
       checkedAt: expect.any(Number),
     });
@@ -2044,6 +2052,7 @@ describe("startAutoUpdates", () => {
     expect(module.getUpdateStatus()).toMatchObject({
       state: "error",
       message: "Couldn't check for updates — the update server couldn't be reached. Check your connection and try again.",
+      errorInfo: { kind: "unreachable", phase: "check" },
       netError: true,
       requestId: "manual-update-1",
     });
@@ -3459,6 +3468,7 @@ describe("returnToHome", () => {
       state: "error",
       requestId: "req-return",
       message: "Couldn't return to your update channel — the update server isn't available right now. Try again in a few minutes.",
+      errorInfo: { kind: "unavailable", phase: "return" },
     });
   });
 
@@ -3794,7 +3804,7 @@ describe("quitAndInstallUpdate", () => {
       const expected = "Couldn't install the update — the update server timed out. Try again in a few minutes.";
       const progress = await startMacUpdateProgress.mock.results[0].value;
       expect(progress.fail).toHaveBeenCalledWith(expected);
-      expect(module.getUpdateStatus()).toMatchObject({ state: "error", message: expected });
+      expect(module.getUpdateStatus()).toMatchObject({ state: "error", message: expected, errorInfo: { kind: "timeout", phase: "install" } });
     } finally { restore(); }
   });
 
